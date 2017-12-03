@@ -1,0 +1,10 @@
+[kubernetes:children]
+kubernetes_masters
+kubernetes_slaves
+
+[kubernetes_masters]
+xdrdev1
+
+[kubernetes_slaves]
+xdrdev2
+xdrdev3

@@ -1,0 +1,17 @@
+---
+# DAEMON RELOAD
+- name: daemon reload
+  systemd:
+    daemon-reload: yes
+
+# RESTART DOCKER
+- name: restart docker
+  service: 
+    name: '{{ docker_service_name }}'
+    state: restarted
+
+# RESTART KUBELET
+- name: restart kubelet
+  service: 
+    name: '{{ kubernetes_service_name }}'
+    state: restarted

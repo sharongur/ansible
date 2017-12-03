@@ -1,0 +1,47 @@
+---
+# DOCKER (all) docker task
+docker_repo_file_src: 'docker-ce.repo'
+docker_repo_file_dst: '/etc/yum.repos.d/docker-ce.repo'
+docker_package_name: 'docker-ce-17.09.0.ce-1.el7.centos'
+docker_package_state: 'present'
+docker_service_name: 'docker'
+docker_service_state: 'started'
+docker_service_enabled: 'yes'
+docker_daemon_file_src: 'daemon.json.j2'
+docker_daemon_file_src: '/etc/docker/daemon.json'
+docker_daemon_graph: '/data/docker'
+
+# KUBERNETES (all) kubernetes_node task
+kubernetes_repo_file_src: 'kubernetes.repo'
+kubernetes_repo_file_dst: '/etc/yum.repos.d/kubernetes.repo'
+kubernetes_packages_names:
+  - kubelet-1.8.4
+  - kubeadm-1.8.4
+  - kubectl-1.8.4
+  - kubernetes-cni-0.5.1
+kubernetes_packages_state: 'present'
+kubernetes_service_name: 'kubelet'
+kubernetes_service_state: 'started'
+kubernetes_service_enabled: 'yes'
+kubernetes_kubeadm_conf_file: '/etc/systemd/system/kubelet.service.d/10-kubeadm.conf'
+kubernetes_kubelet_cgroup_driver: 'cgroupfs'
+kubernetes_kubeadm_log_file: '/var/log/kubeadm.log'
+kubernetes_sysctl_params:
+  - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1', state: 'present'  }
+  - { name: 'net.bridge.bridge-nf-call-iptables', value: '1', state: 'present' }
+
+kubernetes_slave_kubeadm_args: "join --token=abcdef.1234567890abcdef {{ groups['kubernetes_masters'][0] }}:6443"
+# KUBERNETES (masters) kubernetes_infra tasks
+kubernetes_admin_conf_file_src: 'admin.conf.j2'
+kubernetes_admin_conf_file_dst: '/etc/kubernetes/admin.conf'
+kubernetes_pki_dir_src: 'pki'
+kubernetes_pki_dir_dst: '/etc/kubernetes'
+kubernetes_master_kubeadm_args: "init --token=abcdef.1234567890abcdef --token-ttl=0 --apiserver-cert-extra-sans={{ groups['kubernetes_masters'][0] }}.kubernetes.cluster"
+
+kubernetes_infra_log_file: '/var/log/kubeinfra.log'
+kubernetes_infra_services:
+  - "https://git.io/weave-kube-1.6" 
+  - "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$(kubectl version | base64 | tr -d '\n') --namespace kube-system"
+  - "https://raw.githubusercontent.com/sharongur/ansible/master/roles/kubernetes/files/manifests/kubernetes-dashboard.yml"
+  - "https://raw.githubusercontent.com/sharongur/ansible/master/roles/kubernetes/files/manifests/heapster.yml"
+ 

@@ -1,0 +1,9 @@
+---
+- name: Apply Kubernetes cluster infrastructure services (Outputting to {{ kubernetes_infra_log_file }}) (Masters only)
+  shell: 'kubectl apply -f {{ kubernetes_infra_service }} >> {{ kubernetes_infra_log_file }} 2>&1'
+  environment:
+    KUBECONFIG: '{{ kubernetes_admin_conf_file_dst }}'
+  with_items: '{{ kubernetes_infra_services }}'
+  loop_control:
+    loop_var: kubernetes_infra_service
+  tags: [ 'kubernetes', 'infra', 'services' ]

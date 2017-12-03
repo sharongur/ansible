@@ -1,0 +1,32 @@
+# Ref: https://docs.docker.com/engine/installation/linux/centos/#install-docker
+---
+- name: Ensure {{ docker_repo_file_dst }} repository file is configured 
+  copy:
+    src: '{{ docker_repo_file_src }}'
+    dest: '{{ docker_repo_file_dst }}'
+  tags: [ 'docker', 'repo' ]
+
+- name: Ensure {{ docker_package_name }} package is {{ docker_package_state }}
+  yum: 
+    name: '{{ docker_package_name }}'
+    state: '{{ docker_package_state }}'
+  tags: [ 'docker', 'package' ]
+
+- name: Ensure Docker daemon file - {{ docker_daemon_file_dst }}
+  template:
+    src: '{{ docker_daemon_file_src }}'
+    dest: '{{ docker_daemon_file_dst }}'
+  notify:
+    - daemon reload
+    - restart docker
+  tags: [ 'docker', 'daemon', 'file' ]
+
+- name: Flush handlers, daemon reload in particular if anything changed in {{ docker_daemon_file_dst }}
+  meta: flush_handlers
+
+- name: Ensure {{ docker_service_name }} service is {{ docker_service_state }}
+  service:
+    name: '{{ docker_service_name }}'
+    state: '{{ docker_service_state }}'
+    enabled: '{{ docker_service_enabled }}'
+  tags: [ 'docker', 'service' ]

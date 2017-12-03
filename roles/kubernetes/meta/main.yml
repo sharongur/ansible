@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: Omer Ozery
+  description: Kubernetes Role (masters and slaves)
+  company: Gefen
+  min_ansible_version: 2.4
+  platforms:
+   - name: CentOS
+     versions:
+     - 7

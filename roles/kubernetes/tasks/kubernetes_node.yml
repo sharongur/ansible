@@ -1,0 +1,64 @@
+# Ref: https://kubernetes.io/docs/setup/independent/install-kubeadm
+# Ref: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm
+---
+- name: Ensure SELinux is disabled
+  selinux:
+    state: disabled
+  tags: [ 'kubernetes', 'selinux' ]
+
+- name: Ensure Kubernetes sysctl params
+  sysctl:
+    name: "{{ kubernetes_sysctl_param.name }}"
+    value: "{{ kubernetes_sysctl_param.value }}"
+    state: "{{ kubernetes_sysctl_param.state }}"
+  with_items: "{{ kubernetes_sysctl_params }}"
+  loop_control:
+    loop_var: kubernetes_sysctl_param
+  tags: [ 'kubernetes', 'sysctl', 'params' ]
+
+- name: Ensure {{ kubernetes_repo_file_dst }} repository file is configured
+  copy:
+    src: '{{ kubernetes_repo_file_src }}'
+    dest: '{{ kubernetes_repo_file_dst }}'
+  tags: [ 'kubernetes', 'repo', 'file' ]
+
+- name: Ensure Kubernetes packages {{ kubernetes_packages_names }} are - {{ kubernetes_packages_state }}
+  yum:
+    name: '{{ kubernetes_packages_names }}'
+    state: '{{ kubernetes_packages_state }}'
+  tags: [ 'kubernetes', 'packages' ]
+
+- name: Ensure Kubelet cgroup driver - {{ kubernetes_kubelet_cgroup_driver }} 
+  replace:
+    path: '{{ kubernetes_kubeadm_conf_file }}'
+    regexp: 'cgroup-driver=systemd'
+    replace: 'cgroup-driver={{ kubernetes_kubelet_cgroup_driver }}'
+    backup: yes
+  notify:
+    - daemon reload 
+    - restart kubelet
+  tags: [ 'kubernetes', 'kubelet', 'cgroup', 'driver' ]
+
+- name: Flush handlers, daemon reload in particular if anything changed in {{ kubernetes_kubeadm_conf_file }}
+  meta: flush_handlers
+
+- name: Ensure {{ kubernetes_service_name }} service is {{ kubernetes_service_state }}
+  service:
+    name: '{{ kubernetes_service_name }}'
+    state: '{{ kubernetes_service_state }}'
+    enabled: '{{ kubernetes_service_enabled }}'
+  tags: [ 'kubernetes', 'kubelet', 'service' ]
+
+- name: Set Kubernetes kubeadm args (Slaves Only) 
+  set_fact:
+    kubernetes_kubeadm_args: "{{ kubernetes_slave_kubeadm_args }}"
+  when: "'kubernetes_slaves' in group_names"
+
+- name: Set Kubernetes kubeadm args (Masters Only) 
+  set_fact:
+    kubernetes_kubeadm_args: "{{ kubernetes_master_kubeadm_args }}"
+  when: "'kubernetes_masters' in group_names"
+
+- name: Execute Kubeadm {{ kubernetes_kubeadm_args }} (Outputting to {{ kubernetes_kubeadm_log_file }})
+  shell: 'kubeadm {{ kubernetes_kubeadm_args }} > {{ kubernetes_kubeadm_log_file }} 2>&1'
+  tags: [ 'kubernetes', 'kubeadm' ]

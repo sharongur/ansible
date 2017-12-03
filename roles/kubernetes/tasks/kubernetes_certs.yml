@@ -1,0 +1,12 @@
+---
+- name: Ensure Kubernetes master CA certificates - {{ kubernetes_pki_dir_dst }} (Masters only)
+  copy:
+    src: '{{ kubernetes_pki_dir_src }}'
+    dest: '{{ kubernetes_pki_dir_dst }}'
+  tags: [ 'kubernetes', 'master', 'ca', 'certs' ]
+
+- name: Ensure Kubernetes master admin.conf file - {{ kubernetes_admin_conf_file_dst }} (Masters only)
+  template:
+    src: '{{ kubernetes_admin_conf_file_src }}'
+    dest: '{{ kubernetes_admin_conf_file_dst }}'
+  tags: [ 'kubernetes', 'master', 'admin', 'conf', 'file' ]
