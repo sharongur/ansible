@@ -1,21 +1,19 @@
 ---
 
-- debug: msg={{ kubernetes_kubeadm_args }}
-#- name: Include docker task (All nodes)
-#- name: Include docker task (All nodes)
-#  import_tasks: docker.yml
-#  tags: [ 'docker' ]
+- name: Include docker task (All nodes)
+  import_tasks: docker.yml
+  tags: [ 'docker' ]
 
-#- name: Include kubernetes certificates task (Masters only)
-#  import_tasks: kubernetes_certs.yml
-#  when: "'kubernetes_masters' in group_names"
-#  tags: [ 'kubernetes', 'master', 'certs' ]
+- name: Include kubernetes certificates task (Masters only)
+  import_tasks: kubernetes_certs.yml
+  when: "'kubernetes_masters' in group_names"
+  tags: [ 'kubernetes', 'master', 'certs' ]
 
-#- name: Include Kubernetes node task
-#  import_tasks: kubernetes_node.yml
-#  tags: [ 'kubernetes', 'node' ]
+- name: Include Kubernetes node task
+  import_tasks: kubernetes_node.yml
+  tags: [ 'kubernetes', 'node' ]
 
-#- name: Include Kubernetes node task (Masters only)
-#  import_tasks: kubernetes_infra.yml
-#  when: "'kubernetes_masters' in group_names"
-#  tags: [ 'kubernetes', 'master', 'infra' ]
+- name: Include Kubernetes node task (Masters only)
+  import_tasks: kubernetes_infra.yml
+  when: "'kubernetes_masters' in group_names"
+  tags: [ 'kubernetes', 'master', 'infra' ]

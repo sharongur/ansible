@@ -8,7 +8,7 @@ docker_service_name: 'docker'
 docker_service_state: 'started'
 docker_service_enabled: 'yes'
 docker_daemon_file_src: 'daemon.json.j2'
-docker_daemon_file_src: '/etc/docker/daemon.json'
+docker_daemon_file_dst: '/etc/docker/daemon.json'
 docker_daemon_graph: '/data/docker'
 
 # KUBERNETES (all) kubernetes_node task

@@ -6,6 +6,10 @@
     state: disabled
   tags: [ 'kubernetes', 'selinux' ]
 
+- name: Disable Swap
+  command: swapoff -a
+  tags: [ 'kubernetes', 'swap' ]
+
 - name: Ensure Kubernetes sysctl params
   sysctl:
     name: "{{ kubernetes_sysctl_param.name }}"
